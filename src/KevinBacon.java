@@ -22,10 +22,10 @@ public class KevinBacon
 		
 		while ( rs.next() ) 
 		{
-            String identifier = rs.getString("identifier");
-            String title = rs.getString("title");
-            hm_identifierTitle.put(identifier, title);
-        }
+			String identifier = rs.getString("identifier");
+			String title = rs.getString("title");
+			hm_identifierTitle.put(identifier, title);
+		}
 		st.close();
 		
 		//Build the graph
