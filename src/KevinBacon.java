@@ -54,7 +54,7 @@ public class KevinBacon
 				for (int v : path)
 				{
 					if (hm_identifierTitle.containsKey(sg.getMh()[v]))
-						System.out.println("   " + hm_identifierTitle.get(sg.getMh()[v]));
+						System.out.println("     " + hm_identifierTitle.get(sg.getMh()[v]));
 					else 
 						System.out.println("   " + sg.getMh()[v]);
 				}	
