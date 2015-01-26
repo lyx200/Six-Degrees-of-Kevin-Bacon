@@ -1,5 +1,6 @@
-import java.io.BufferedReader;
-import java.io.FileReader;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.HashMap;
 
 public class SymbolGraph //dealing with arbitrary Vertex names
@@ -9,22 +10,20 @@ public class SymbolGraph //dealing with arbitrary Vertex names
 	private String[] mh; //inverse mapping: int to String
 	private Graph G;
 	
-	public SymbolGraph(String fileName, String delim) throws Exception 
-	{	//builds from a .txt file 
+	//builds from MySQL
+	public SymbolGraph(Connection con) throws Exception 
+	{
 		hm = new HashMap<>();
-		BufferedReader in = new BufferedReader(new FileReader(fileName));
-		String line;
+		Statement st = con.createStatement();
 		
 		//first scan: associate all String names with integer values
-		while ( (line=in.readLine()) != null )
+		ResultSet rs = st.executeQuery("SELECT * FROM actors; ");
+		while ( rs.next() ) 
 		{
-			String[] names = line.split(delim);
-			for (int x=0;x<names.length;x++)
-			{
-				String name = names[x];
-				if (!hm.containsKey(name)) 
-					hm.put(name,hm.size());
-			}
+			String name = rs.getString("name");
+			String movie_id = rs.getString("movie_id");
+			if (!hm.containsKey(name)) hm.put(name,hm.size());
+			if (!hm.containsKey(movie_id)) hm.put(movie_id,hm.size());
 		}
 		//build inverse mapping
 		mh = new String[hm.size()];
@@ -34,20 +33,19 @@ public class SymbolGraph //dealing with arbitrary Vertex names
 			mh[num] = name;
 		}
 		
-		//second scan: actually build the Graph
+		//second scan: build the Graph
 		G = new Graph(hm.size());
-		in = new BufferedReader(new FileReader(fileName));
-		while ( (line=in.readLine()) != null )
+		rs = st.executeQuery("SELECT * FROM actors; ");
+		while ( rs.next() ) 
 		{
-			String[] names = line.split(delim);
-			int v = hm.get(names[0]);
-			for (int x=1;x<names.length;x++)
-			{
-				int w = hm.get(names[x]);
-				G.addEdge(v, w);
-			}
+			String name = rs.getString("name");
+			String movie_id = rs.getString("movie_id");
+			int v = hm.get(name);
+			int w = hm.get(movie_id);
+			G.addEdge(v, w);
 		}
 		
+		st.close();
 	}
 	
 	public boolean contains(String s) { return hm.containsKey(s); }	
